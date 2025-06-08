@@ -1,0 +1,27 @@
+services:
+  text_sender:
+    container_name: text_sender
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    env_file:
+      - ../.dev.env
+    command: "python application/main.py"
+    networks:
+      - text_case_backend
+
+  taskiq_worker_sender:
+    container_name: taskiq_worker_sender
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    env_file:
+      - ../.dev.env
+    ports: [ ]
+    command: [ taskiq, worker, infra.taskiq.app:taskiq_broker, infra.taskiq.sender_tasks, -w, "1", --max-fails, "1"]
+    networks:
+      - text_case_backend
+
+networks:
+  text_case_backend:
+    external: true
